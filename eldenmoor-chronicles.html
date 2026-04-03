@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eldenmoor Chronicles</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --gold-dim: #7a6030;
+    --bg-deep: #0a0806;
+    --bg-panel: #12100d;
+    --bg-panel2: #1a1610;
+    --bg-slot: #0e0c09;
+    --border: #3a2e1a;
+    --border-bright: #6a5428;
+    --red: #c0392b;
+    --blue: #2980b9;
+    --green: #27ae60;
+    --purple: #8e44ad;
+    --text: #d4c49a;
+    --text-dim: #7a6e52;
+    --rarity-common: #a0a0a0;
+    --rarity-uncommon: #27ae60;
+    --rarity-rare: #2980b9;
+    --rarity-epic: #8e44ad;
+    --rarity-legendary: #c9a84c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-deep);
+    font-family: 'Crimson Text', serif;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(60,30,80,0.08) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a84c' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(20,16,10,0.95) 0%, transparent 100%);
+  }
+  .game-title {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(201,168,76,0.4);
+  }
+  .game-title span { color: var(--gold-light); }
+  .topbar-right { display: flex; gap: 20px; align-items: center; }
+  .resource { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+  .resource-icon { font-size: 16px; }
+  .resource-val { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
+
+  /* ── MAIN LAYOUT ── */
+  .main {
+    width: 100%;
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: 280px 1fr 280px;
+    gap: 16px;
+    padding: 20px 24px;
+  }
+
+  /* ── PANELS ── */
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.03) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .panel-header {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(90deg, rgba(201,168,76,0.08) 0%, transparent 100%);
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panel-header .subtitle { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; font-family: 'Crimson Text', serif; text-transform: none; }
+
+  /* ── CHARACTER PANEL ── */
+  .char-portrait {
+    margin: 16px auto;
+    width: 120px;
+    height: 150px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .char-portrait-frame {
+    width: 120px; height: 150px;
+    background: linear-gradient(160deg, #1e1a12 0%, #0e0c08 100%);
+    border: 2px solid var(--border-bright);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 70px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 20px rgba(201,168,76,0.1);
+  }
+  .char-portrait-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 60%, rgba(201,168,76,0.08) 100%);
+  }
+  .char-glow {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 20px;
+    background: radial-gradient(ellipse, rgba(201,168,76,0.3) 0%, transparent 70%);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+
+  .char-name-block { text-align: center; padding: 0 16px 12px; }
+  .char-name { font-family: 'Cinzel', serif; font-size: 18px; color: var(--gold-light); font-weight: 700; }
+  .char-class { font-size: 13px; color: var(--purple); font-style: italic; }
+  .char-level { font-family: 'Cinzel', serif; font-size: 11px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+
+  /* XP Bar */
+  .xp-section { padding: 0 16px 12px; }
+  .bar-label { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .bar-track { height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; border: 1px solid var(--border); }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+  .bar-xp { background: linear-gradient(90deg, #8e44ad, #c0392b); width: 67%; }
+  .bar-hp { background: linear-gradient(90deg, #c0392b, #e74c3c); width: 85%; }
+  .bar-mp { background: linear-gradient(90deg, #1a5276, #2980b9); width: 55%; }
+
+  /* Stats */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 0 16px 16px; }
+  .stat-item {
+    background: var(--bg-slot);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .stat-item:hover { border-color: var(--gold-dim); }
+  .stat-name { font-size: 9px; letter-spacing: 1px; color: var(--text-dim); text-transform: uppercase; }
+  .stat-val { font-family: 'Cinzel', serif; font-size: 15px; color: var(--gold); }
+  .stat-val span { font-size: 10px; color: var(--green); margin-left: 2px; }
+
+  /* ── EQUIPMENT PANEL (middle) ── */
+  .equip-area {
+    display: grid;
+    grid-template-columns: 80px 1fr 80px;
+    grid-template-rows: repeat(5, 70px);
+    gap: 8px;
+    padding: 16px;
+    align-items: center;
+    justify-items: center;
+  }
+  .equip-center {
+    grid-column: 2;
+    grid-row: 1 / 6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  .character-silhouette {
+    font-size: 130px;
+    line-height: 1;
+    filter: drop-shadow(0 0 20px rgba(201,168,76,0.2));
+    animation: float 3s ease-in-out infinite;
+    user-select: none;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+  .equip-slot {
+    width: 64px;
+    height: 64px;
+    background: var(--bg-slot);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+    font-size: 26px;
+  }
+  .equip-slot:hover { border-color: var(--gold-dim); background: rgba(201,168,76,0.05); transform: scale(1.05); }
+  .equip-slot.filled { border-color: var(--gold-dim); }
+  .equip-slot .slot-label { font-size: 8px; color: var(--text-dim); letter-spacing: 0.5px; margin-top: 2px; text-transform: uppercase; }
+  .equip-slot .slot-empty { font-size: 22px; opacity: 0.15; }
+  .equip-slot .rarity-dot {
+    position: absolute;
+    top: 3px; right: 3px;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+  }
+  .slot-connector {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    grid-column: 1 / 4;
+    display: none;
+  }
+
+  /* ── INVENTORY PANEL ── */
+  .inv-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .inv-tab {
+    flex: 1;
+    padding: 8px 4px;
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .inv-tab:hover { color: var(--text); }
+  .inv-tab.active { color: var(--gold); border-bottom-color: var(--gold); background: rgba(201,168,76,0.05); }
+
+  .inv-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    padding: 12px;
+  }
+  .inv-slot {
+    aspect-ratio: 1;
+    background: var(--bg-slot);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .inv-slot:hover { border-color: var(--gold-dim); background: rgba(201,168,76,0.06); transform: scale(1.08); z-index: 10; }
+  .inv-slot.empty { opacity: 0.3; }
+  .inv-slot .item-count {
+    position: absolute;
+    bottom: 2px; right: 3px;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    color: var(--gold);
+    text-shadow: 0 0 4px rgba(0,0,0,1);
+  }
+  .inv-slot .item-rarity {
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+  }
+
+  /* ── TOOLTIP ── */
+  .tooltip {
+    position: fixed;
+    background: var(--bg-panel2);
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    padding: 12px;
+    min-width: 200px;
+    max-width: 240px;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+  }
+  .tooltip.visible { opacity: 1; }
+  .tt-name { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .tt-type { font-size: 11px; color: var(--text-dim); font-style: italic; margin-bottom: 8px; }
+  .tt-divider { height: 1px; background: var(--border); margin: 6px 0; }
+  .tt-stat { font-size: 12px; color: var(--text); display: flex; justify-content: space-between; }
+  .tt-stat .plus { color: var(--green); }
+  .tt-desc { font-size: 11px; color: var(--text-dim); font-style: italic; margin-top: 6px; line-height: 1.4; }
+  .tt-rarity { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; margin-top: 6px; }
+
+  /* ── SKILL BAR ── */
+  .skillbar {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 24px;
+    background: var(--bg-panel);
+    border-top: 1px solid var(--border);
+  }
+  .skill-slot {
+    width: 52px; height: 52px;
+    background: var(--bg-slot);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .skill-slot:hover { border-color: var(--gold-dim); transform: translateY(-3px); }
+  .skill-slot.active { border-color: var(--gold); box-shadow: 0 0 10px rgba(201,168,76,0.3); }
+  .skill-slot .keybind {
+    position: absolute;
+    bottom: 2px; right: 3px;
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    color: var(--text-dim);
+  }
+  .skill-slot .cd-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    color: white;
+  }
+  .skill-divider { width: 1px; background: var(--border); margin: 4px 0; }
+
+  /* ── NOTIFICATIONS ── */
+  .notif-area {
+    position: fixed;
+    top: 80px; right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 500;
+  }
+  .notif {
+    background: var(--bg-panel2);
+    border: 1px solid var(--border-bright);
+    border-left: 3px solid var(--gold);
+    padding: 8px 12px;
+    border-radius: 3px;
+    font-size: 12px;
+    min-width: 200px;
+    animation: slideIn 0.3s ease, fadeOut 0.5s ease 2.5s forwards;
+  }
+  @keyframes slideIn { from{transform:translateX(20px);opacity:0} to{transform:none;opacity:1} }
+  @keyframes fadeOut { to{opacity:0;transform:translateX(10px)} }
+  .notif-title { font-family: 'Cinzel', serif; font-size: 11px; color: var(--gold); margin-bottom: 2px; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg-deep); }
+  ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+  /* corner ornaments */
+  .ornament {
+    position: absolute;
+    width: 10px; height: 10px;
+    border-color: var(--gold-dim);
+    border-style: solid;
+    opacity: 0.5;
+  }
+  .ornament.tl { top: 2px; left: 2px; border-width: 1px 0 0 1px; }
+  .ornament.tr { top: 2px; right: 2px; border-width: 1px 1px 0 0; }
+  .ornament.bl { bottom: 2px; left: 2px; border-width: 0 0 1px 1px; }
+  .ornament.br { bottom: 2px; right: 2px; border-width: 0 1px 1px 0; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="game-title">⚔ Eldenmoor <span>Chronicles</span></div>
+  <div class="topbar-right">
+    <div class="resource"><span class="resource-icon">💰</span><span class="resource-val">12,480</span></div>
+    <div class="resource"><span class="resource-icon">💎</span><span class="resource-val">340</span></div>
+    <div class="resource"><span class="resource-icon">⚗️</span><span class="resource-val">28</span></div>
+    <div class="resource" style="color:#7a6e52;font-size:12px;">Thornwood Forest</div>
+  </div>
+</div>
+
+<!-- MAIN 3-COLUMN LAYOUT -->
+<div class="main">
+
+  <!-- LEFT: CHARACTER STATS -->
+  <div class="panel">
+    <div class="ornament tl"></div><div class="ornament tr"></div>
+    <div class="ornament bl"></div><div class="ornament br"></div>
+    <div class="panel-header">Character <span class="subtitle">Lv. 47 Arcane Elf</span></div>
+
+    <div class="char-portrait">
+      <div class="char-portrait-frame">🧝</div>
+      <div class="char-glow"></div>
+    </div>
+
+    <div class="char-name-block">
+      <div class="char-name">Aeltharyn</div>
+      <div class="char-class">Shadowmage Adept</div>
+      <div class="char-level">LEVEL 47 · ELF · GUILD: SILVER VEIL</div>
+    </div>
+
+    <div class="xp-section">
+      <div class="bar-label"><span>HP</span><span>8,450 / 9,900</span></div>
+      <div class="bar-track"><div class="bar-fill bar-hp"></div></div>
+    </div>
+    <div class="xp-section" style="padding-top:0;">
+      <div class="bar-label"><span>MP</span><span>3,210 / 5,800</span></div>
+      <div class="bar-track"><div class="bar-fill bar-mp"></div></div>
+    </div>
+    <div class="xp-section" style="padding-top:0;">
+      <div class="bar-label"><span>XP</span><span>67,400 / 100,000</span></div>
+      <div class="bar-track"><div class="bar-fill bar-xp"></div></div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-item" onmouseenter="showTip(event,'Strength','Physical power. Increases melee damage and carrying capacity.','STR affects weapon damage and stamina.')" onmouseleave="hideTip()">
+        <div class="stat-name">Strength</div><div class="stat-val">34 <span>+8</span></div>
+      </div>
+      <div class="stat-item" onmouseenter="showTip(event,'Intelligence','Magical aptitude. Increases spell power and mana pool.','INT is your primary stat as a Shadowmage.')" onmouseleave="hideTip()">
+        <div class="stat-name">Intelligence</div><div class="stat-val">98 <span>+24</span></div>
+      </div>
+      <div class="stat-item" onmouseenter="showTip(event,'Agility','Speed and precision. Affects dodge chance and attack speed.','AGI contributes to your critical strike rating.')" onmouseleave="hideTip()">
+        <div class="stat-name">Agility</div><div class="stat-val">61 <span>+12</span></div>
+      </div>
+      <div class="stat-item" onmouseenter="showTip(event,'Endurance','Vitality and resilience. Increases HP and physical defense.','END reduces incoming physical damage.')" onmouseleave="hideTip()">
+        <div class="stat-name">Endurance</div><div class="stat-val">45 <span>+6</span></div>
+      </div>
+      <div class="stat-item" onmouseenter="showTip(event,'Spirit','Magical resistance. Enhances mana regeneration.','SPI allows faster recovery between fights.')" onmouseleave="hideTip()">
+        <div class="stat-name">Spirit</div><div class="stat-val">77 <span>+18</span></div>
+      </div>
+      <div class="stat-item" onmouseenter="showTip(event,'Luck','Fate\'s favor. Affects critical chance and item drop rates.','LCK can turn the tide in your favor.')" onmouseleave="hideTip()">
+        <div class="stat-name">Luck</div><div class="stat-val">29 <span>+3</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER: EQUIPMENT DOLL -->
+  <div class="panel">
+    <div class="ornament tl"></div><div class="ornament tr"></div>
+    <div class="ornament bl"></div><div class="ornament br"></div>
+    <div class="panel-header">Equipment <span class="subtitle">Gear Score: 4,820</span></div>
+
+    <div class="equip-area">
+      <!-- Row 1: Helmet, [center], Amulet -->
+      <div class="equip-slot filled" onmouseenter="showTip(event,'Veilwoven Circlet','Head · Epic','INT +18, SPI +12\nSet: Shadowmage (2/4)\n&quot;Woven from moonthread by the Dusk Sisters.&quot;','epic')" onmouseleave="hideTip()">
+        <div class="rarity-dot" style="background:var(--rarity-epic)"></div>
+        👑<div class="slot-label">Head</div>
+      </div>
+      <div style="grid-row:1/6; grid-column:2; display:flex; align-items:center; justify-content:center; position:relative;">
+        <div class="character-silhouette">🧝‍♀️</div>
+      </div>
+      <div class="equip-slot filled" onmouseenter="showTip(event,'Starfall Pendant','Amulet · Legendary','INT +30, SPI +20, MP +500\n&quot;A tear from the Astral Dragon, crystallized.&quot;','legendary')" onmouseleave="hideTip()">
+        <div class="rarity-dot" style="background:var(--rarity-legendary)"></div>
+        📿<div class="slot-label">Amulet</div>
+      </div>
+
+      <!-- Row 2: Shoulders, Ring1 -->
+      <div class="equip-slot filled" onmouseenter="showTip(event,'Dusk Mantle','Shoulders · Rare','INT +10, AGI +8\n&quot;Shoulders draped in perpetual twilight.&quot;','rare')" onmouseleave="hideTip()">
+        <div class="rarity-dot" style="background:var(--rarity-rare)"></div>
+        🔮<div class="slot-label">Shoulders</div>
+      </div>
+      <div class="equip-slot filled" onmouseenter="showTip(event,'Ring of Eternity','Ring · Epic','INT +12, SPI +8, Crit +3%\n&quot;Time bends around the wearer.&quot;','epic')" onmouseleave="hideTip()">
+        <div class="rarity-dot" style="background:var(--rarity-epic)"></div>
+        💍<div class="slot-label">Ring</div>
+      </div>
+
+      <!-- Row 3: Chest, Ring2 -->
+      <div class="equip-slot filled" onmouseenter="showTip(event,'Arcane Silk Robe','Chest · Epic','INT +22, SPI +14, HP +800\nSet: Shadowmage (1/4)\n&quot;Stitched with spells of concealment.&quot;','epic')" onmouseleave="hideTip()">
+        <div class="rarity-dot" style="background:var(--rarity-epic)"></div>
+        🥻<div class="slot-label">Chest</div>
+      </div>
+      <div class="equip-slot" onmouseenter="showTip(event,'Ring Slot','Empty','Drag a ring here to equip it.','')" onmouseleave="hideTip()">
+        <span class="slot-empty">○</span><div class="slot-label">Ring</div>
+      </div>
+
+      <!-- Row 4: Weapon, Offhand -->
+      <div class="equip-slot filled" onmouseenter="showTip(event,'Nightwhisper Staff','Weapon · Legendary','INT +45, SPI +28, Spell Power +180\nSpecial: Shadow Pulse on cast\n&quot;Carved from the World Ash. Remembers every spell.&quot;','legendary')" onmouseleave="hideTip()">
+        <div class="rarity-dot" style="background:var(--rarity-legendary)"></div>
+        🪄<div class="slot-label">Weapon</div>
+      </div>
+      <div class="equip-slot filled" onmouseenter="showTip(event,'Spellweave Tome','Offhand · Rare','INT +14, MP +300, CD Reduction +5%\n&quot;Pages rewrite themselves with new incantations.&quot;','rare')" onmouseleave="hideTip()">
+        <div class="rarity-dot" style="background:var(--rarity-rare)"></div>
+        📖<div class="slot-label">Offhand</div>
+      </div>
+
+      <!-- Row 5: Boots, Gloves -->
+      <div class="equip-slot filled" onmouseenter="showTip(event,'Phantom Treads','Boots · Uncommon','AGI +14, Move Speed +8%\n&quot;Leave no footprints in the Fade.&quot;','uncommon')" onmouseleave="hideTip()">
+        <div class="rarity-dot" style="background:var(--rarity-uncommon)"></div>
+        👢<div class="slot-label">Boots</div>
+      </div>
+      <div class="equip-slot filled" onmouseenter="showTip(event,'Glovewraps of Focus','Gloves · Rare','INT +8, Cast Speed +4%\n&quot;Hands guided by ancient elf memory.&quot;','rare')" onmouseleave="hideTip()">
+        <div class="rarity-dot" style="background:var(--rarity-rare)"></div>
+        🧤<div class="slot-label">Gloves</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: INVENTORY -->
+  <div class="panel">
+    <div class="ornament tl"></div><div class="ornament tr"></div>
+    <div class="ornament bl"></div><div class="ornament br"></div>
+    <div class="panel-header">Inventory <span class="subtitle">38 / 60</span></div>
+    <div class="inv-tabs">
+      <div class="inv-tab active" onclick="switchTab(this,'all')">All</div>
+      <div class="inv-tab" onclick="switchTab(this,'equip')">Gear</div>
+      <div class="inv-tab" onclick="switchTab(this,'consume')">Potions</div>
+      <div class="inv-tab" onclick="switchTab(this,'quest')">Quest</div>
+      <div class="inv-tab" onclick="switchTab(this,'mat')">Crafting</div>
+    </div>
+    <div class="inv-grid" id="inv-grid"></div>
+  </div>
+
+</div>
+
+<!-- SKILL BAR -->
+<div class="skillbar">
+  <div class="skill-slot active" onmouseenter="showTip(event,'Shadow Bolt','Active · 0.8s cast','Hurls a bolt of shadow energy. Deals 480% INT as shadow damage.','epic')" onmouseleave="hideTip()">🌑<div class="keybind">1</div></div>
+  <div class="skill-slot" onmouseenter="showTip(event,'Void Eruption','Active · 1.5s cast','Erupts void energy from target location. AoE, 320% INT.','rare')" onmouseleave="hideTip()">💥<div class="keybind">2</div></div>
+  <div class="skill-slot" onmouseenter="showTip(event,'Fade Step','Active · Instant','Teleport 12 meters in any direction. 8s cooldown.','uncommon')" onmouseleave="hideTip()">💨<div class="keybind">3</div></div>
+  <div class="skill-slot" onmouseenter="showTip(event,'Arcane Shield','Active · Instant','Absorbs 2,400 damage for 6s. 20s cooldown.','rare')" onmouseleave="hideTip()">🛡️<div class="keybind">4</div>
+    <div class="cd-overlay">4s</div>
+  </div>
+  <div class="skill-slot" onmouseenter="showTip(event,'Elven Sight','Passive','Increases critical strike chance by 12%. Always active.','uncommon')" onmouseleave="hideTip()">👁️<div class="keybind">5</div></div>
+  <div class="skill-divider"></div>
+  <div class="skill-slot" onmouseenter="showTip(event,'Health Potion','Consumable','Restores 3,000 HP instantly. 45s cooldown.','common')" onmouseleave="hideTip()">🧪<div class="keybind">F1</div></div>
+  <div class="skill-slot" onmouseenter="showTip(event,'Mana Crystal','Consumable','Restores 1,800 MP instantly. 60s cooldown.','common')" onmouseleave="hideTip()">💠<div class="keybind">F2</div></div>
+  <div class="skill-divider"></div>
+  <div class="skill-slot" onmouseenter="showTip(event,'Mount: Moonshard','Mount','Summon your Moonshard Stag. Increases movement speed by 160%.','epic')" onmouseleave="hideTip()">🦌<div class="keybind">M</div></div>
+</div>
+
+<!-- TOOLTIP -->
+<div class="tooltip" id="tooltip"></div>
+
+<!-- NOTIFICATIONS -->
+<div class="notif-area" id="notifs"></div>
+
+<script>
+// ── INVENTORY DATA ──
+const items = [
+  {e:'🗡️',n:'Shadowedge Blade',t:'Weapon · Epic',stats:'+42 INT, +18 AGI',desc:'A blade that cuts between realms.',r:'epic'},
+  {e:'🧪',n:'Greater Mana Potion',t:'Consumable',stats:'Restores 2,400 MP',desc:'Distilled from moonpetals.',r:'uncommon',count:6},
+  {e:'💎',n:'Void Crystal',t:'Crafting Material',stats:'Quality: Rare',desc:'Crystallized void energy. Used in Tier 5 crafting.',r:'rare',count:3},
+  {e:'🌿',n:'Elfroot Bundle',t:'Crafting Material',stats:'Quality: Common',desc:'Common healing herb.',r:'common',count:12},
+  {e:'📜',n:'Tome of Shadow I',t:'Quest Item',stats:'—',desc:'Recover this tome for Archivist Veyne.',r:'uncommon'},
+  {e:'🥾',n:'Swiftwalker Boots',t:'Boots · Rare',stats:'+16 AGI, +10% Move',desc:'Found in the Hollow Vaults.',r:'rare'},
+  {e:'🍷',n:'Elixir of Power',t:'Consumable',stats:'+25% Spell Power (1hr)',desc:'Brewed by the Crimson Alchemists.',r:'rare',count:2},
+  {e:'🪬',n:'Charm of Warding',t:'Trinket · Epic',stats:'+20 SPI, +12% Resist',desc:'Blessed by the Last Oracle.',r:'epic'},
+  {e:'🔑',n:'Dungeon Key: Ashen Spire',t:'Quest Item',stats:'—',desc:'Opens the gate to the Ashen Spire.',r:'uncommon'},
+  {e:'🗺️',n:'Map Fragment VII',t:'Quest Item',stats:'—',desc:'Piece of the ancient world map.',r:'common'},
+  {e:'⚗️',n:'Philosopher\'s Reagent',t:'Crafting Material',stats:'Quality: Epic',desc:'Extremely rare. Needed for legendary transmutation.',r:'epic',count:1},
+  {e:'🧲',n:'Magnetite Shard',t:'Crafting Material',stats:'Quality: Uncommon',desc:'Has faint magical properties.',r:'uncommon',count:5},
+  {e:'🎴',n:'Arcane Card: Storm',t:'Collection',stats:'Power: 3,400',desc:'Summons a thunderstorm in battle.',r:'legendary'},
+  {e:'🧤',n:'Sorcerer\'s Grip',t:'Gloves · Rare',stats:'+11 INT, +6% Cast Speed',desc:'Lightweight weave for quick casting.',r:'rare'},
+  {e:'💊',n:'Antidote Capsule',t:'Consumable',stats:'Cures all poisons',desc:'Standard issue for dungeon runs.',r:'common',count:4},
+  {e:'🦷',n:'Dragon Fang',t:'Crafting Material',stats:'Quality: Rare',desc:'Dropped from Elder Drake. Hard and magical.',r:'rare',count:2},
+  {e:'🪄',n:'Wand of Whispers',t:'Weapon · Uncommon',stats:'+22 INT, Silence 5%',desc:'Whispers secrets of the dead to its wielder.',r:'uncommon'},
+  {e:'🍄',n:'Glowcap Mushroom',t:'Crafting Material',stats:'Quality: Common',desc:'Glows softly. Used in potions.',r:'common',count:9},
+  // empty slots
+  ...Array(17).fill(null)
+];
+
+const rarityColors = {
+  legendary: 'var(--rarity-legendary)',
+  epic: 'var(--rarity-epic)',
+  rare: 'var(--rarity-rare)',
+  uncommon: 'var(--rarity-uncommon)',
+  common: 'var(--rarity-common)',
+  '': 'transparent'
+};
+const rarityLabels = {
+  legendary:'◆ Legendary',epic:'◆ Epic',rare:'◆ Rare',uncommon:'◆ Uncommon',common:'◆ Common',''
+  :''
+};
+
+function buildInventory() {
+  const grid = document.getElementById('inv-grid');
+  grid.innerHTML = '';
+  items.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'inv-slot' + (item ? '' : ' empty');
+    if (item) {
+      el.innerHTML = `
+        <div class="item-rarity" style="background:${rarityColors[item.r||'']}"></div>
+        ${item.e}
+        ${item.count ? `<div class="item-count">${item.count}</div>` : ''}
+      `;
+      el.addEventListener('mouseenter', e => showTip(e, item.n, item.t, item.stats + '\n' + item.desc, item.r));
+      el.addEventListener('mouseleave', hideTip);
+      el.addEventListener('click', () => addNotif(`${item.e} ${item.n}`, item.t));
+    } else {
+      el.innerHTML = `<span style="opacity:0.1;font-size:18px">□</span>`;
+    }
+    grid.appendChild(el);
+  });
+}
+buildInventory();
+
+// ── TOOLTIP ──
+const tip = document.getElementById('tooltip');
+function showTip(e, name, type, statsRaw, rarity) {
+  const rc = rarityColors[rarity] || 'var(--text-dim)';
+  const rl = rarityLabels[rarity] || '';
+  const stats = (statsRaw||'').split('\n').filter(Boolean);
+  tip.innerHTML = `
+    <div class="tt-name" style="color:${rc}">${name}</div>
+    <div class="tt-type">${type}</div>
+    <div class="tt-divider"></div>
+    ${stats.slice(0,-1).map(s => `<div class="tt-stat">${s.includes('+') ? '<span class="plus">'+s+'</span>' : s}</div>`).join('')}
+    ${stats.length > 1 ? '<div class="tt-divider"></div>' : ''}
+    <div class="tt-desc">${stats[stats.length-1]||''}</div>
+    ${rl ? `<div class="tt-rarity" style="color:${rc}">${rl}</div>` : ''}
+  `;
+  tip.classList.add('visible');
+  moveTip(e);
+}
+function moveTip(e) {
+  const x = e.clientX + 16, y = e.clientY - 10;
+  tip.style.left = Math.min(x, window.innerWidth - 260) + 'px';
+  tip.style.top = Math.max(10, Math.min(y, window.innerHeight - 200)) + 'px';
+}
+function hideTip() { tip.classList.remove('visible'); }
+document.addEventListener('mousemove', e => { if(tip.classList.contains('visible')) moveTip(e); });
+
+// ── TABS ──
+function switchTab(el, type) {
+  document.querySelectorAll('.inv-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  addNotif('📦 Filter', 'Showing: ' + el.textContent);
+}
+
+// ── NOTIFICATIONS ──
+function addNotif(title, body) {
+  const area = document.getElementById('notifs');
+  const n = document.createElement('div');
+  n.className = 'notif';
+  n.innerHTML = `<div class="notif-title">${title}</div><div style="font-size:11px;color:var(--text-dim)">${body}</div>`;
+  area.appendChild(n);
+  setTimeout(() => n.remove(), 3200);
+}
+
+// Boot notif
+setTimeout(() => addNotif('⚔ Welcome back, Aeltharyn', 'Server: Thornwood · Ping: 24ms'), 600);
+setTimeout(() => addNotif('🐉 World Event Active', 'Eldenmoor Dragon Siege — 02:14 remaining'), 1800);
+</script>
+</body>
+</html>
